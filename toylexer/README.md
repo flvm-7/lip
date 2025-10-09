@@ -27,7 +27,7 @@ You will work on the following files in the `lib` directory:
 The main routine in [bin/main.ml](bin/main.ml)
 reads a line from the stdin, and processes it
 according to the command line:
-```
+``` 
 dune exec toylexer
 ```
 which prints the sequence of tokens fed from stdin.
