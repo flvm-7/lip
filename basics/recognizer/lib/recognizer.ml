@@ -1,46 +1,48 @@
-let lang1 w = 
-  match w with 
-    [] -> false
-    | _ -> List.fold_left (&&) true (List.map (fun x -> (x = '0') || (x = '1')) w)
+module AuxFun = struct
+  let is_one_or_zero x = x = '0' || x = '1'
 
-let lang2 w = 
-  match w with 
-    [] -> true
-    | '0'::w' -> List.for_all (fun x -> x = '1') w'
-    | _ -> List.for_all (fun x -> x = '1') w  
+  let is_one = (=) '1'
 
-let lang3 w =
-  let rec aux w acc = 
-    match w with
-      [] -> acc > 2
-      | n::w' -> 
-          if n = '1' then aux w' acc 
-          else if n = '0' then aux w' (acc+1)
-          else false 
-  in match w with 
-    '0'::w' -> aux w' 0
+  let rec aux_lang3 = function
+    | [] -> false
+    | '0'::[] -> true
+    | h::t -> if is_one_or_zero h then aux_lang3 t else false
+
+  let transform_ones x = if x = '1' then 1 else 0 
+
+  let count_ones w = List.fold_left ( + ) 0 (List.map transform_ones w)
+
+  let rec aux_lang5 = function
+    | [] -> true
+    | n::n'::w -> if (n = n') && is_one_or_zero n then aux_lang5 w else false
+    | _ -> false
+end
+
+let lang1 = let open AuxFun in function
+  | [] -> false
+  | w -> List.fold_left (&&) true (List.map is_one_or_zero w)
+
+let lang2 = let open AuxFun in function 
+  | [] -> true
+  | '0'::w' -> List.for_all is_one w'
+  | w -> List.for_all is_one w  
+
+let lang3 = let open AuxFun in function
+    | '0'::t -> aux_lang3 t
     | _ -> false
 
-let lang4 w = 
-  let rec aux w acc = 
-    match w with 
-      [] -> acc = 2 
-      | n::w' -> 
-        if n = '0' then aux w' acc
-        else if n = '1' then aux w' (acc+1)
-        else false
-  in aux w 0
+let lang4 = let open AuxFun in function
+  | [] -> false
+  | w -> begin
+      if (List.fold_left ( && ) true (List.map is_one_or_zero w)) then
+        (count_ones w) = 2
+      else false
+    end
 
-let lang5 w = 
-  let rec aux w =
-    match w with 
-      [] -> false
-      | '0'::'0'::[] | '1'::'1'::[] -> true
-      | n::n'::w' -> 
-        if (n = n' && (n = '0' || n = '1')) then aux w'
-        else false
-      | _ -> false
-  in aux w
+let lang5 = let open AuxFun in function
+  | [] -> false
+  | _::[] -> false
+  | w -> aux_lang5 w 
     
 let recognizers = [lang1;lang2;lang3;lang4;lang5]
                   
