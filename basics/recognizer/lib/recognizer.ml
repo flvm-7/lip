@@ -28,13 +28,13 @@ let lang2 = let open AuxFun in function
   | w -> List.for_all is_one w  
 
 let lang3 = let open AuxFun in function
-    | '0'::t -> aux_lang3 t
-    | _ -> false
+  | '0'::t -> aux_lang3 t
+  | _ -> false
 
 let lang4 = let open AuxFun in function
   | [] -> false
   | w -> begin
-      if (List.fold_left ( && ) true (List.map is_one_or_zero w)) then
+      if (List.fold_left ( && ) true (List.map is_one_or_zero w)) then 
         (count_ones w) = 2
       else false
     end

@@ -1,6 +1,6 @@
 (lang dune 3.20)
 
-(name contextfree)
+(name boolexpr)
 
 (generate_opam_files true)
 
@@ -16,7 +16,7 @@
 (documentation https://url/to/documentation)
 
 (package
- (name contextfree)
+ (name boolexpr)
  (synopsis "A short synopsis")
  (description "A longer description")
  (depends ocaml)
@@ -24,3 +24,4 @@
   ("add topics" "to describe" your project)))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/reference/dune-project/index.html
+(using menhir 3.0)

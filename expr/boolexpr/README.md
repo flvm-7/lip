@@ -21,7 +21,7 @@ To instruct dune that our project will use Menhir, add the following line at the
 ```bash
 (using menhir 2.1)
 ```
-Now, create a directory `lib` under `boolexpr`:
+Now, create a directory `lib` under `boolexpr`: 
 ```bash
 mkdir lib
 ```
@@ -314,7 +314,7 @@ You'll notice that the definition of `trace1` is missing the case for when the c
 To simplify debugging, the project includes a frontend which allow users to run the functions `eval` and `trace` by command line,
 providing the input via stdin or file.
 Before proceeding, copy the files [main.ml](bin/main.ml) and [dune](bin/dune) into your working directory, under `boolexpr/bin`.
-Then, execute:
+|Then, execute:
 ```bash
 dune exec boolexpr
 ```
