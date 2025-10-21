@@ -22,17 +22,17 @@ let%test "test_type2" = test_type "if true then false else false or true" (Some 
 
 let%test "test_type3" = test_type "if iszero 0 then iszero succ 0 else false or true" (Some BoolT)
 
-let%test "test_type4" = test_type "succ 0" (Some NatT)
+let%test "test_type4" = test_type "succ 0" (Some PosNatT)
 
-let%test "test_type5" = test_type "succ succ succ pred pred succ succ pred succ pred succ 0" (Some NatT)
+let%test "test_type5" = test_type "succ succ succ pred pred succ succ pred succ pred succ 0" (None)
 
 let%test "test_type6" = test_type "iszero pred succ 0" (Some BoolT)
 
 let%test "test_type7" = test_type "iszero pred succ 0 and not iszero succ pred succ 0" (Some BoolT)
 
-let%test "test_type8" = test_type "pred 0" (Some NatT)
+let%test "test_type8" = test_type "pred 0" (None)
 
-let%test "test_type9" = test_type "pred pred succ 0" (Some NatT)
+let%test "test_type9" = test_type "pred pred succ 0" (None)
     
 let%test "test_type10" = test_type "iszero true" None
 

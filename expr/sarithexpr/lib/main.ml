@@ -1,6 +1,6 @@
 open Ast
 
-type exprtype = BoolT | NatT
+type exprtype = BoolT | NatT | PosNatT
 
 let parse s = 
   let lexbuf = Lexing.from_string s in
@@ -22,6 +22,7 @@ let rec string_of_expr = function
 let string_of_type = function
   | BoolT -> "Bool"
   | NatT -> "Nat"
+  | PosNatT -> "PosNat"
 
 exception TypeError of string
 
@@ -54,12 +55,21 @@ let rec typecheck = function
   | True -> BoolT
   | False -> BoolT
   | Zero -> NatT
-  | Succ(e) | Pred(e) -> begin 
-      if NatT = typecheck e then NatT
-      else raise (TypeError (string_of_error e BoolT NatT))
+  | Succ(e) -> begin 
+    e
+    |> function
+      | Zero -> PosNatT
+      | Succ(e') | Pred(e') -> typecheck e' 
+      | e' -> raise (TypeError (string_of_error e' (typecheck e') NatT))
+    end
+  | Pred(e) -> begin 
+      let t = typecheck e in
+      if t = PosNatT then NatT
+      else raise (TypeError (string_of_error e t PosNatT))
     end
   | IsZero(e) -> begin 
-      if NatT = typecheck e then BoolT
+      let t = typecheck e in
+      if t = PosNatT || t = NatT then BoolT
       else raise (TypeError (string_of_error e BoolT NatT))
     end
   | Not(e) -> begin
@@ -69,8 +79,8 @@ let rec typecheck = function
   | And(e1,e2) | Or(e1,e2) -> begin
     (typecheck e1, typecheck e2)
     |> function
-      | (NatT, _) -> raise (TypeError (string_of_error e1 NatT BoolT))
-      | (BoolT, NatT) -> raise (TypeError (string_of_error e2 NatT BoolT))
+      | (t, _) when t <> BoolT -> raise (TypeError (string_of_error e1 t BoolT))
+      | (_, t) when t <> BoolT -> raise (TypeError (string_of_error e2 t BoolT))
       | _ -> BoolT
     end 
   | If(e1,e2,e3) -> begin 
@@ -80,7 +90,7 @@ let rec typecheck = function
           |> function 
             | (BoolT, true) -> t1
             | (BoolT, false) -> raise (TypeError (string_of_error e2 t1 t2))
-            | (NatT, _) -> raise (TypeError (string_of_error e1 NatT BoolT))
+            | (t, _) -> raise (TypeError (string_of_error e1 t BoolT))
     end
 
 exception NoRuleApplies
@@ -141,3 +151,6 @@ let rec trace e = try
   let e' = trace1 e 
     in e::(trace e')
   with NoRuleApplies -> [e]
+
+let string_of_val expr = 
+  "-: " ^ (string_of_type (typecheck expr)) ^ " = " ^ (string_of_expr expr)
