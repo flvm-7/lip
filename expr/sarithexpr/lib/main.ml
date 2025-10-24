@@ -55,18 +55,37 @@ let rec typecheck = function
   | True -> BoolT
   | False -> BoolT
   | Zero -> NatT
+
   | Succ(e) -> begin 
-    e
-    |> function
-      | Zero -> PosNatT
-      | Succ(e') | Pred(e') -> typecheck e' 
-      | e' -> raise (TypeError (string_of_error e' (typecheck e') NatT))
+      e |> function
+        | Zero -> PosNatT
+        | Succ(e') -> begin 
+            let t = typecheck e' in  
+            if t = PosNatT || t = NatT then PosNatT
+            else raise (TypeError (string_of_error e' t NatT)) 
+          end
+        | Pred(e') ->begin 
+            let t = typecheck e' in
+            if t = PosNatT || t = NatT then t
+            else raise (TypeError (string_of_error e' t NatT))    
+          end
+        | e -> raise (TypeError (string_of_error e (typecheck e) NatT))
     end
   | Pred(e) -> begin 
-      let t = typecheck e in
-      if t = PosNatT then NatT
-      else raise (TypeError (string_of_error e t PosNatT))
-    end
+      e |> function
+        | Succ(Zero) -> NatT
+        | Succ(e') -> begin
+            let t = typecheck e' in
+            if t = PosNatT || t = NatT then t
+            else raise (TypeError (string_of_error e' t NatT)) 
+          end
+        | Pred(e') -> begin
+            let t = typecheck (Pred(e')) in
+            if t = PosNatT then PosNatT
+            else raise (TypeError (string_of_error (Pred(e')) t PosNatT))
+          end
+        | e -> raise (TypeError (string_of_error e (typecheck e) PosNatT))
+      end
   | IsZero(e) -> begin 
       let t = typecheck e in
       if t = PosNatT || t = NatT then BoolT
@@ -77,8 +96,7 @@ let rec typecheck = function
       else raise (TypeError (string_of_error e NatT BoolT))
     end 
   | And(e1,e2) | Or(e1,e2) -> begin
-    (typecheck e1, typecheck e2)
-    |> function
+    (typecheck e1, typecheck e2) |> function
       | (t, _) when t <> BoolT -> raise (TypeError (string_of_error e1 t BoolT))
       | (_, t) when t <> BoolT -> raise (TypeError (string_of_error e2 t BoolT))
       | _ -> BoolT

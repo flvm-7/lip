@@ -24,7 +24,7 @@ let%test "test_type3" = test_type "if iszero 0 then iszero succ 0 else false or 
 
 let%test "test_type4" = test_type "succ 0" (Some PosNatT)
 
-let%test "test_type5" = test_type "succ succ succ pred pred succ succ pred succ pred succ 0" (None)
+let%test "test_type5" = test_type "succ succ succ pred pred succ succ pred succ pred succ 0" (Some PosNatT)
 
 let%test "test_type6" = test_type "iszero pred succ 0" (Some BoolT)
 
