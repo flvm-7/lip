@@ -6,5 +6,3 @@ type ast =
   | Sub of ast * ast
   | Mul of ast * ast
   | Div of ast * ast
-
- 
